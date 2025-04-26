@@ -1,0 +1,53 @@
+nav {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* allows stacking on small screens */
+  }
+  
+  nav img {
+    height: 5rem;
+    max-width: 100%;
+  }
+  
+  /* Adjust image size for smaller screens */
+  @media (max-width: 640px) {
+    nav img {
+      height: 3.5rem;
+    }
+  }
+  
+  nav button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    background-color: transparent;
+    color: #ccc;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  /* Optional hover effect */
+  nav button:hover {
+    background-color: rgb(71, 68, 68);
+  }
+  
+  /* Responsive alignment: center items on smaller screens */
+  @media (max-width: 640px) {
+    nav {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+  
+    nav button {
+      width: 100%;
+      max-width: 200px;
+    }
+    
+  }
+  
+  
