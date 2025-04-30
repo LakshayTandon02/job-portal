@@ -1,36 +1,61 @@
-import superbaseClient, { supabaseUrl } from "@/utils/Superbase";
+import { supabaseClient, supabaseUrl } from "@/utils/Superbase";
 
 export async function applyToJob(token, jobData) {
-    const supabase = await superbaseClient(token);
+    const supabase = await supabaseClient(token);
 
     const random = Math.floor(Math.random() * 90000);
     const fileName = `resume-${random}-${jobData.candidate_id}`;
 
     // Upload the resume to Supabase storage
-    const { error: storageError } = await supabase.storage.from("resumes").upload(fileName, jobData.resume);
+    const { error: storageError } = await supabase.storage
+        .from("resumes")
+        .upload(fileName, jobData.resume);
 
-    // Check for errors in uploading the resume
     if (storageError) {
-        console.log("Error Uploading Resume : ", storageError);  // Corrected reference to storageError
+        console.error("Error Uploading Resume:", storageError);
         return null;
     }
 
-    // Construct the public URL for the uploaded resume
     const resume = `${supabaseUrl}/storage/v1/object/public/resumes/${fileName}`;
 
-    // Insert the job application record into the database
-    const { data, error } = await supabase.from("applications").insert([{
-        ...jobData,
-        resume,
-    }]).select();
+    const { data, error } = await supabase
+        .from("applications")
+        .insert([{ ...jobData, resume }])
+        .select();
 
-    // Check for errors when submitting the application
     if (error) {
-        console.error("Error Submitting Application: ", error);
-    } else {
-        console.log("Application submitted successfully!", data);
+        console.error("Error Submitting Application:", error);
+        return null;
     }
 
-    return data;  // Return the data to indicate success
+    return data;
 }
 
+export async function updateapplications(token, { application_id, status }) {
+    console.log('Updating application:', { application_id, status }); // Debug log
+    
+    const supabase = await supabaseClient(token);
+    const { data, error } = await supabase
+        .from("applications")
+        .update({ status })
+        .eq("id", application_id)
+        .select();
+
+    console.log('Update result:', { data, error }); // Debug log
+
+    if (error) {
+        console.error("Supabase Error Details:", {
+            message: error.message,
+            code: error.code,
+            details: error.details
+        });
+        return null;
+    }
+    
+    if (!data || data.length === 0) {
+        console.error("No data returned from update");
+        return null;
+    }
+    
+    return data;
+}

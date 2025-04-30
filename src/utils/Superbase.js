@@ -18,4 +18,4 @@ const supabaseClient = async (supabaseAccessToken) => {
 };
 
 // export default supabase;
-export { supabase, supabaseClient }; // ✅ This fixes your error
+export { supabase, supabaseClient , supabaseUrl }; // ✅ This fixes your error

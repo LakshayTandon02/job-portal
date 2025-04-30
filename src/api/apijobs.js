@@ -76,7 +76,7 @@ export async function saveJob(token, { alreadySaved, job_id, user_id }) {
       .eq("user_id", user_id);
 
     if (deleteError) {
-      console.error("Error Deleting saved job:", deleteError);
+      console.error(" Error Deleting saved job: ", deleteError);
       return null;
     }
 
@@ -150,6 +150,20 @@ export async function getsingleJob(token, { job_id }) {
       return data; // Return the updated data
     }
   
-    
+  }
+
+  export async function addnewjob(token , _,jobdata){
+    const supabase = await supabaseClient(token);
+
+    const {data , error} =  await supabase
+    .from('jobs')
+    .insert([jobdata])
+     .select("*");
+
+     if(error){
+      console.error("Error Creating JOb" , error);
+      return null;
+     }
+     return data;
   }
   
