@@ -44,3 +44,11 @@
   padding-left: 25px;
   color: white;
 }
+/* Add to your global styles */
+.wmde-markdown {
+  background-color: #011532;
+  color: white;
+}
+.wmde-markdown pre {
+  background-color: #1f2937;
+}

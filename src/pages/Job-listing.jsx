@@ -1,4 +1,4 @@
-import { getcompanies } from '@/api/apicompanies';
+import { getCompanies } from '@/api/apicompanies';
 import { getJobs } from '@/api/apijobs';
 import JobCard from '@/components/jobcard';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ const JobListing = () => {
     searchQuery,
   });
 
-  const { fn: fnCompanies, data: companies } = useFetch(getcompanies);
+  const { fn: fnCompanies, data: companies } = useFetch(getCompanies);
 
   useEffect(() => {
     if (isLoaded) fnCompanies();
