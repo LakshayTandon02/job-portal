@@ -24,16 +24,17 @@ const JobCard = ({
 
   const handleSaveJob = async () => {
     try {
-      const token = await getToken();
+      const token = await getToken({template: 'supabase'});
 
-      const result = await saveJob(token, { alreadySaved: saved }, {
+      const result = await saveJob(token, {
+        alreadySaved: saved,
         job_id: job.id,
         user_id: user.id,
       });
 
       if (result) {
-        setSaved(!saved);
-        onJobSaved();
+        setSaved(prev => !prev);
+        onJobSaved(); // notify parent if needed
       }
     } catch (err) {
       console.error('Error saving job:', err);
@@ -52,13 +53,13 @@ const JobCard = ({
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4 flex-1">
-        <div className='flex justify-between'>
-          {job.company && <img src={job.company.logo_url} className='h-6' />}
-          <div className='flex gap-2 items-center'>
+        <div className="flex justify-between items-center">
+          {job.company && <img src={job.company.logo_url} alt="Company Logo" className="h-6" />}
+          <div className="flex gap-2 items-center">
             <MapPinIcon size={15} /> {job.location}
           </div>
         </div>
-        <hr className='bg-[#011532] solid to-black' />
+        <hr className="bg-[#011532] solid to-black" />
         {job.description?.substring(0, job.description.indexOf("."))}
       </CardContent>
 
@@ -75,14 +76,14 @@ const JobCard = ({
         {!isMyjob && (
           <Button
             variant="outline"
-            className={`w-15 ${saved ? 'bg-red-100' : ''}`}
+            className="w-15 hover:bg-red-100"
             onClick={handleSaveJob}
           >
-            {saved ? (
-              <Heart size={20} stroke="red" fill="red" />
-            ) : (
-              <Heart size={20} />
-            )}
+            <Heart
+              size={20}
+              stroke={saved ? 'red' : 'white'}
+              fill={saved ? 'red' : 'none'}
+            />
           </Button>
         )}
       </CardFooter>

@@ -31,19 +31,34 @@ export async function getJobs(token, { location, company_id, searchQuery }) {
 }
 
 // 2. Get saved jobs
-export async function getSavedJobs(token) {
+export async function getSavedJobs(token, user_id) {
   const supabase = await supabaseClient(token);
+
   const { data, error } = await supabase
-    .from("saved_jobs")
-    .select("*, job: jobs(*, company: companies(name,logo_url))");
+    .from('saved_jobs')
+    .select(`
+      id,
+      job:job_id (
+        id,
+        title,
+        location,
+        description,
+        company:company_id (
+          name,
+          logo_url
+        )
+      )
+    `)
+    .eq('user_id', user_id); // ✅ filter by logged-in user
 
   if (error) {
-    console.error("Error fetching Saved Jobs:", error);
+    console.error('Error fetching Saved Jobs:', error);
     return null;
   }
 
   return data;
 }
+
 
 // 3. Get single job by ID
 export async function getSingleJob(token, { job_id }) {
@@ -166,4 +181,18 @@ export async function getsingleJob(token, { job_id }) {
      }
      return data;
   }
+  export async function getMyJobs(token, { recruiter_id }) {
+    const supabase = await supabaseClient(token);
   
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("*, company: companies(name,logo_url)")
+      .eq("recruiter_id", recruiter_id);
+  
+    if (error) {
+      console.error("Error fetching Jobs:", error);
+      return null;
+    }
+  
+    return data;
+  }

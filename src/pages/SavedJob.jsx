@@ -1,76 +1,56 @@
-import { useEffect } from 'react'; // Added this import
-import useFetch from '@/hooks/usefetch';
-import { getSavedJobs } from '@/api/apijobs';
-import JobCard from '@/components/JobCard';
-import { BarLoader } from 'react-spinners';
-import { toast } from 'sonner';
+import { getSavedJobs } from "@/api/apijobs";
+import JobCard from "@/components/JobCard";
+import useFetch from "@/hooks/usefetch";
+import { useUser } from "@clerk/clerk-react";
+import { useEffect } from "react";
+import { BarLoader } from "react-spinners";
 
-const SavedJob = () => {
-  const { 
-    data: savedJobs, 
-    loading, 
-    error,
-    fetchData: fetchSavedJobs
-  } = useFetch(getSavedJobs, true);
+const SavedJobs = () => {
+  const { isLoaded } = useUser();
+
+  const {
+    loading: loadingSavedJobs,
+    data: savedJobs,
+    fn: fnSavedJobs,
+  } = useFetch(getSavedJobs);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error.message);
+    if (isLoaded) {
+      fnSavedJobs();
     }
-  }, [error]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center p-12">
-        <BarLoader width="100%" color="#3B82F6" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-500">Error loading saved jobs</p>
-        <button 
-          onClick={fetchSavedJobs}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Retry
-        </button>
-      </div>
-    );
+  if (!isLoaded || loadingSavedJobs) {
+    return <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <h1 className="text-3xl font-bold text-center mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">
-        Your Saved Jobs
+    <div>
+      <h1 className="gradient-title font-extrabold text-6xl sm:text-7xl text-center pb-8">
+        Saved Jobs
       </h1>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {savedJobs?.length ? (
-          savedJobs.map((saved) => (
-            <JobCard
-              key={saved.id}
-              job={saved.job}
-              savedInit={true}
-              onJobSaved={fetchSavedJobs}
-            />
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12">
-            <p>No saved jobs found</p>
-            <button 
-              onClick={fetchSavedJobs}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Refresh
-            </button>
-          </div>
-        )}
-      </div>
+      {loadingSavedJobs === false && (
+        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {savedJobs?.length ? (
+            savedJobs?.map((saved) => {
+              return (
+                <JobCard
+                  key={saved.id}
+                  job={saved?.job}
+                  onJobAction={fnSavedJobs}
+                  savedInit={true}
+                />
+              );
+            })
+          ) : (
+            <div className="text-red-500 text-center ">No Saved Jobs 👀</div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
-export default SavedJob;
+export default SavedJobs;
